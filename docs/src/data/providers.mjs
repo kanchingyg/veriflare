@@ -514,6 +514,32 @@ export async function GET(request: Request) {
     docs: "https://docs.mollie.com/reference/webhooks-new",
   },
   {
+    id: "mercadopago",
+    name: "Mercado Pago",
+    region: "LatAm",
+    fn: "verifyMercadoPago",
+    entry: "mercadopago",
+    env: "MP_WEBHOOK_SECRET",
+    headers: ["x-signature", "x-request-id"],
+    scheme:
+      "HMAC-SHA256 of `id:<data.id>;request-id:<x-request-id>;ts:<ts>;` (omit missing pairs), hex-encoded as `v1` in `x-signature: ts=...,v1=...`. `data.id` comes from the query string and is used exactly as received.",
+    secret:
+      "The **secret signature** from **Your integrations → Webhooks → Configure notifications**. Reveal the key after saving the endpoint. It is not an Access Token.",
+    tolerance: "300 seconds",
+    eventType: "the body's `action` (e.g. `payment.created`), falling back to `type`",
+    notes: [
+      "The body is not part of the signature. Treat the notification as a change signal and fetch the resource from the Mercado Pago / Mercado Libre API.",
+      "Pass the request URL (or `{ url }`) so query `data.id` can be read. Use the value exactly as received (do not rewrite case).",
+      "The `ts` value in `x-signature` is copied verbatim into the manifest. Mercado Pago's published example uses Unix seconds; verihook's replay check also accepts millisecond-shaped values.",
+      "QR Code notifications are not signed — do not verify them with this provider.",
+      "Default replay window is 300s. Mercado Pago may retry for longer; if a retry reuses the same `ts`, set `{ tolerance: 0 }` or a wider window, and dedupe by `x-request-id` / resource id.",
+      "Lemon Squeezy also sends `x-signature`, but with a different shape (raw hex of the body). Use the matching provider name.",
+      "Works on Cloudflare Workers and other edge runtimes (Web Crypto via `crypto.subtle`). The official Node SDK uses `node:crypto`.",
+    ],
+    testSecret: "mp_test_secret",
+    docs: "https://www.mercadopago.com/developers/en/docs/your-integrations/notifications/webhooks",
+  },
+  {
     id: "adyen",
     name: "Adyen",
     region: "Europe",

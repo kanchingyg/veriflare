@@ -27,6 +27,7 @@ const SIGNATURE_HEADERS: Array<[header: string, provider: string]> = [
   ["x-square-hmacsha256-signature", "square"],
   ["x-zm-signature", "zoom"],
   ["x-mollie-signature", "mollie"],
+  ["x-signature", "lemonsqueezy or mercadopago"],
   ["hmacsignature", "adyen"],
   ["cko-signature", "checkout"],
   ["x-anet-signature", "authorizenet"],

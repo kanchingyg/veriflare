@@ -224,6 +224,19 @@ export interface MollieEvent {
   [key: string]: unknown;
 }
 
+/** Mercado Pago notification; `action` is preferred for `result.eventType`. */
+export interface MercadoPagoEvent {
+  id?: number | string;
+  live_mode?: boolean;
+  type?: string;
+  action?: string;
+  date_created?: string;
+  user_id?: number | string;
+  api_version?: string;
+  data?: Fields & { id?: string | number };
+  [key: string]: unknown;
+}
+
 export interface AdyenNotificationRequestItem {
   eventCode: string;
   success: "true" | "false";
@@ -462,6 +475,7 @@ export interface ProviderEventMap {
   cashfree: CashfreeEvent;
   phonepe: PhonePeEvent;
   mollie: MollieEvent;
+  mercadopago: MercadoPagoEvent;
   adyen: AdyenEvent;
   checkout: CheckoutEvent;
   authorizenet: AuthorizeNetEvent;

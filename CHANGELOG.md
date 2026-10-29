@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- **Mercado Pago** provider (`mercadopago`, `verifyMercadoPago`, `verihook/mercadopago`): verifies `x-signature` (`ts`/`v1`) with `x-request-id` and query `data.id` via Web Crypto (works on Cloudflare Workers).
+
 ## [1.21.2] - 2026-10-19
 
 No code changes; the published package is the same as 1.21.1.

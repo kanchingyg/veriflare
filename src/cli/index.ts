@@ -514,6 +514,17 @@ function simulationSample(
           createdAt: new Date(now).toISOString(),
         },
       };
+    case "mercadopago":
+      return {
+        secret: "mp_webhook_secret_123",
+        payload: {
+          id: now,
+          live_mode: false,
+          type: "payment",
+          action: eventType || "payment.created",
+          data: { id: String(now) },
+        },
+      };
     case "adyen":
       return {
         // Adyen HMAC keys are hex; this placeholder is not a real key.
@@ -771,7 +782,7 @@ Commands:
 
 Supported Providers:
   stripe, github, shopify, slack, twilio, svix, resend, clerk, meta, whatsapp, discord, twitter, x, paypal, lemonsqueezy, paddle, pagerduty, webflow, workos, linear, razorpay, square, zoom,
-  cashfree, phonepe, mollie, adyen, checkout, authorizenet, recurly,
+  cashfree, phonepe, mollie, mercadopago, adyen, checkout, authorizenet, recurly,
   gitlab, bitbucket, vercel, sentry, twitch, telegram, postmark, sendgrid, mailgun,
   hubspot, intercom, calendly, typeform, standard-webhooks
 

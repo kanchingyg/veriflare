@@ -9,6 +9,10 @@ import {
 } from "../core/crypto.js";
 import { adyenSigningString } from "../providers/adyen.js";
 import { hubspotV3Uri } from "../providers/hubspot.js";
+import {
+  mercadopagoDataIdFromUrl,
+  mercadopagoSigningManifest,
+} from "../providers/mercadopago.js";
 import { ProviderName, VerifyWebhookOptions } from "../core/types.js";
 import {
   base64ToBytes,
@@ -130,6 +134,7 @@ export const SIGNABLE_PROVIDERS: ReadonlySet<string> = new Set([
   "cashfree",
   "phonepe",
   "mollie",
+  "mercadopago",
   "adyen",
   "checkout",
   "authorizenet",
@@ -572,6 +577,32 @@ export async function signWebhook(
       secret = requireSecret(name, secret);
       const hmac = await computeHmacSha256(secret, body);
       headers["x-mollie-signature"] = `sha256=${bytesToHex(hmac)}`;
+      break;
+    }
+
+    case "mercadopago": {
+      secret = requireSecret(name, secret);
+      const ts = String(timestamp);
+      const requestId = options.webhookId ?? randomId("");
+      const parsed = new URL(url);
+      if (!parsed.searchParams.has("data.id")) {
+        const payloadObj =
+          typeof options.payload === "object" && options.payload
+            ? (options.payload as Record<string, unknown>)
+            : undefined;
+        const nested = payloadObj?.data as { id?: unknown } | undefined;
+        // Prefer data.id only — top-level payload.id is the notification id.
+        const rawId = nested?.id;
+        const fromPayload =
+          rawId !== undefined && rawId !== null ? String(rawId) : undefined;
+        parsed.searchParams.set("data.id", fromPayload ?? randomId(""));
+      }
+      url = parsed.toString();
+      const dataId = mercadopagoDataIdFromUrl(url);
+      const manifest = mercadopagoSigningManifest(dataId, requestId, ts);
+      headers["x-signature"] =
+        `ts=${ts},v1=${bytesToHex(await computeHmacSha256(secret, manifest))}`;
+      headers["x-request-id"] = requestId;
       break;
     }
 
